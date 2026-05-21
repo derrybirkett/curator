@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Autonomous overnight scanner — files GitHub issues for dead exports, oversized files, and stale placeholders. Never modifies code.">
+  <title>Curator — Autonomous overnight code scanner</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+
+  <!-- Hero -->
+  <section id="hero">
+    <div class="hero-badge">read-only agent</div>
+    <h1>See what needs<br>fixing.</h1>
+    <p class="subtitle">
+      Curator runs overnight, scans your codebase for cleanup candidates, and files labelled GitHub Issues. Never touches your code.
+    </p>
+    <div class="cta-group">
+      <a href="https://github.com/derrybirkett/curator" class="btn btn-primary">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.418 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.009-.868-.013-1.703-2.782.604-3.369-1.34-3.369-1.34-.454-1.156-1.11-1.463-1.11-1.463-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.269 2.75 1.025A9.578 9.578 0 0 1 12 6.836a9.59 9.59 0 0 1 2.504.337c1.909-1.294 2.747-1.025 2.747-1.025.546 1.377.202 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.741 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/></svg>
+        View on GitHub
+      </a>
+      <a href="#install" class="btn btn-secondary">Install →</a>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how-it-works">
+    <h2>How it works</h2>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <div class="step-body">
+          <h3>Schedule fires overnight</h3>
+          <p>A GitHub Actions workflow runs on cron. Curator reads your <code>config.yml</code>, checks for a kill switch, then scans the configured paths — <code>lib/</code>, <code>components/</code>, <code>app/</code>, <code>content/</code> by default.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">2</div>
+        <div class="step-body">
+          <h3>Each finding is LLM-verified</h3>
+          <p>Automated tools flag candidates across all enabled scopes. An LLM then filters false positives and assigns a confidence rating — <code>high</code>, <code>med</code>, or <code>low</code>. Findings below your threshold are silently skipped.</p>
+        </div>
+      </div>
+      <div class="step">
+        <div class="step-num">3</div>
+        <div class="step-body">
+          <h3>Issues land in your repo</h3>
+          <p>Up to 5 labelled issues per run, each with a finding, evidence, suggested action, and confidence rating. Deduplication prevents the same issue being filed twice. You decide what to act on.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Scopes -->
+  <section id="scopes">
+    <h2>Detection scopes</h2>
+    <div class="scopes">
+      <div class="scope">
+        <span class="scope-name">dead-exports</span>
+        <p>Exported symbols with no references elsewhere in the codebase — safe to remove or unexport.</p>
+      </div>
+      <div class="scope">
+        <span class="scope-name">oversized-files</span>
+        <p>Files that have grown past the line or symbol threshold and likely need splitting into smaller modules.</p>
+      </div>
+      <div class="scope">
+        <span class="scope-name">stale-placeholders</span>
+        <p>TBD, Coming soon, lorem ipsum, and year markers old enough to be embarrassing. Flags content rot before it ships.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Install -->
+  <section id="install">
+    <h2>Install</h2>
+    <div class="install-block">
+      <div class="block-header">
+        <span class="dot dot-red"></span>
+        <span class="dot dot-yellow"></span>
+        <span class="dot dot-green"></span>
+        bash
+      </div>
+      <pre><span class="comment"># 1. Add Curator as a submodule</span>
+<span class="cmd">git submodule add</span> <span class="arg">https://github.com/derrybirkett/curator</span> .curator
+
+<span class="comment"># 2. Copy the config to your repo root</span>
+<span class="cmd">cp</span> <span class="arg">.curator/config.yml .curator-config.yml</span>
+
+<span class="comment"># 3. Add your Anthropic API key to GitHub repo secrets</span>
+<span class="comment">#    Settings → Secrets → ANTHROPIC_API_KEY</span>
+
+<span class="comment"># 4. Commit and push — Curator runs at 3am UTC</span>
+<span class="cmd">git add</span> <span class="arg">.curator .github/ .curator-config.yml .gitmodules</span>
+<span class="cmd">git commit -m</span> <span class="arg">"chore: install curator"</span>
+<span class="cmd">git push</span></pre>
+    </div>
+  </section>
+
+  <!-- Configure -->
+  <section id="configure">
+    <h2>Configure</h2>
+    <p>Everything lives in <code>.curator-config.yml</code> in your repo root. Flip <code>dry_run</code> off once you're happy with the findings.</p>
+    <div class="config-block"><span class="key">dry_run</span>: <span class="bool">true</span>                  <span class="comment"># writes to workflow summary only — no issues filed</span>
+<span class="key">max_issues_per_run</span>: <span class="num">5</span>
+<span class="key">min_confidence</span>: <span class="str">med</span>         <span class="comment"># high | med | low</span>
+<span class="key">dedup_window_days</span>: <span class="num">30</span>
+
+<span class="key">scopes</span>:
+  <span class="key">dead_exports</span>:
+    <span class="key">enabled</span>: <span class="bool">true</span>
+    <span class="key">threshold</span>: <span class="num">3</span>
+  <span class="key">oversized_files</span>:
+    <span class="key">enabled</span>: <span class="bool">true</span>
+    <span class="key">line_threshold</span>: <span class="num">400</span>
+  <span class="key">stale_placeholders</span>:
+    <span class="key">enabled</span>: <span class="bool">true</span>
+    <span class="key">year_marker_cutoff</span>: <span class="num">2</span></div>
+    <p style="margin-top: 16px;">Kill switch: create <code>.curator-pause</code> at your repo root to halt all runs immediately.</p>
+  </section>
+
+  <!-- Changelog -->
+  <section id="changelog">
+    <h2>Changelog</h2>
+    <div class="changelog">
+      <div class="release">
+        <div class="release-header">
+          <span class="release-version">v0.1.0</span>
+          <span class="release-date">2026-05-21</span>
+        </div>
+        <ul class="release-notes">
+          <li>Initial release as standalone repo (extracted from shulkerbox)</li>
+          <li>Three detection scopes: dead-exports, oversized-files, stale-placeholders</li>
+          <li>LLM-verified findings with confidence ratings</li>
+          <li>Deduplication across runs with configurable window</li>
+          <li>Dry-run mode on by default for 14-night validation period</li>
+          <li>Kill switch via <code>.curator-pause</code> file</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<footer>
+  <div class="container" style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;width:100%">
+    <span>Curator — part of the <a href="https://monospace.studio/ideas/product-labs/delta-suite">Delta Suite</a></span>
+    <a href="https://github.com/derrybirkett/curator">github.com/derrybirkett/curator</a>
+  </div>
+</footer>
+
+</body>
+</html>
