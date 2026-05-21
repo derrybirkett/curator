@@ -1,5 +1,7 @@
 # curator
 
+**[derrybirkett.github.io/curator](https://derrybirkett.github.io/curator/)**
+
 Autonomous overnight scanner — files GitHub issues for dead exports, oversized files, and stale placeholders. Never modifies code.
 
 Part of the [Delta Suite](https://monospace.studio/ideas/product-labs/delta-suite): build → observe → gate.
