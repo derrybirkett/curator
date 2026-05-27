@@ -42,14 +42,15 @@ I check three categories. Full detection logic is in `scopes/`:
 | `oversized-files` | Files that have grown too large and likely need splitting |
 | `stale-placeholders` | TBD, Coming soon, lorem ipsum, and old year markers in content |
 
-I only scan: `lib/`, `components/`, `app/`, `content/`. I skip `node_modules`, `.next`, `public`, `.planning`, and anything in `.gitignore`.
+I scan only the paths in the consuming repo's `scan_paths` config (typical defaults: `lib/`, `components/`, `app/`, `content/`) and skip anything in `exclude_paths` (typical defaults: `node_modules/`, `.next/`, `public/`, `dist/`, `build/`).
 
 ## Output Rules
 
-- **Max 5 issues per run.** If more candidates exist, I log the rest to the workflow summary and skip them.
-- **Dedup**: before filing, I search open issues for `[curator]` prefix. I skip filing if a matching issue is open or was closed in the last 30 days.
-- **Dry-run mode**: when `config.yml` sets `dry_run: true`, I write findings to the workflow summary only — no issues created. Default for the first 14 nights.
-- **Kill switch**: if `.curator-pause` exists at repo root, I exit immediately with status `paused`.
+- **Max issues per run** is set by the consuming repo's `max_issues_per_run` config (default 5). Extras are logged to the workflow summary.
+- **Dedup**: before filing, I search open issues for the `[curator]` title prefix. I skip filing if a matching issue is open or was closed within `dedup_window_days` (default 30).
+- **Wontfix label**: I skip any candidate whose file appears in an issue labelled `curator:wontfix`.
+- **Dry-run mode**: when config sets `dry_run: true`, I write findings to the workflow summary only — no issues created.
+- **Kill switch**: if `.curator-pause` exists at the consuming repo root, I exit immediately with status `paused`.
 
 ## Issue Format
 
@@ -74,7 +75,7 @@ high · med · low
 ---
 Filed by curator agent on YYYY-MM-DD · scope: <category>
 - Close with label `curator:wontfix` to skip this finding in future runs.
-- Edit `config.yml` to disable the scope entirely.
+- Edit your repo's curator config to disable the scope entirely.
 ```
 
 ## Confidence Rating
@@ -85,7 +86,7 @@ Each finding gets a confidence rating based on automated detection + LLM verific
 - **med**: automated tool flagged it, LLM filtered or qualified some results
 - **low**: automated tool flagged it, LLM uncertain — human review strongly recommended
 
-I do not file issues below the threshold set in `config.yml`. Default is `med`.
+I do not file issues below the `min_confidence` threshold set in the consuming repo's config (default `med`).
 
 ## What I Am Not
 
