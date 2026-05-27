@@ -1,0 +1,105 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/derrybirkett/curator/schema.json",
+  "title": "Curator agent config",
+  "description": "Configuration shape for the curator agent. Consuming repos place this file at .github/agents/curator/config.yml (or wherever the host wiring expects). Unset fields fall back to defaults.yml.",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "dry_run": {
+      "type": "boolean",
+      "description": "When true, write findings to the workflow summary only. No GitHub issues are filed."
+    },
+    "max_issues_per_run": {
+      "type": "integer",
+      "minimum": 1,
+      "maximum": 50,
+      "description": "Hard cap on issues filed per run. Extras are logged to workflow summary."
+    },
+    "min_confidence": {
+      "type": "string",
+      "enum": ["high", "med", "low"],
+      "description": "Minimum confidence rating required to file an issue."
+    },
+    "dedup_window_days": {
+      "type": "integer",
+      "minimum": 0,
+      "description": "Skip filing if a matching [curator] issue was closed within this many days."
+    },
+    "scopes": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "Per-scope enablement and tuning.",
+      "properties": {
+        "dead_exports": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "threshold": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Minimum unused exports in a single file to qualify."
+            }
+          }
+        },
+        "oversized_files": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "line_threshold": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Minimum line count to consider."
+            },
+            "symbol_threshold": {
+              "type": "integer",
+              "minimum": 1,
+              "description": "Minimum exported symbol count to consider."
+            }
+          }
+        },
+        "stale_placeholders": {
+          "type": "object",
+          "additionalProperties": false,
+          "properties": {
+            "enabled": { "type": "boolean" },
+            "year_marker_cutoff": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Flag year markers in date fields this many years old or older."
+            }
+          }
+        }
+      }
+    },
+    "scan_paths": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Paths to scan, relative to repo root."
+    },
+    "exclude_paths": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Paths to always exclude, even if inside scan_paths."
+    },
+    "labels": {
+      "type": "object",
+      "additionalProperties": false,
+      "description": "GitHub labels applied to filed issues.",
+      "properties": {
+        "base": {
+          "type": "array",
+          "items": { "type": "string" },
+          "description": "Labels applied to every issue."
+        },
+        "per_scope": {
+          "type": "object",
+          "additionalProperties": { "type": "string" },
+          "description": "Per-scope label overrides keyed by scope name."
+        }
+      }
+    }
+  }
+}

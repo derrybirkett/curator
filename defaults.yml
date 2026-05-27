@@ -1,0 +1,44 @@
+# Curator agent — default configuration
+# Consuming repos override these in their own config.yml.
+# Unset fields fall back to the values below.
+# Shape is defined by schema.json.
+
+dry_run: false
+
+max_issues_per_run: 5
+min_confidence: med
+dedup_window_days: 30
+
+scopes:
+  dead_exports:
+    enabled: true
+    threshold: 3
+  oversized_files:
+    enabled: true
+    line_threshold: 400
+    symbol_threshold: 5
+  stale_placeholders:
+    enabled: true
+    year_marker_cutoff: 2
+
+scan_paths:
+  - lib/
+  - components/
+  - app/
+  - content/
+
+exclude_paths:
+  - node_modules/
+  - .next/
+  - public/
+  - dist/
+  - build/
+
+labels:
+  base:
+    - curator
+    - cleanup
+  per_scope:
+    dead_exports: curator:dead-exports
+    oversized_files: curator:oversized-files
+    stale_placeholders: curator:stale-placeholders
